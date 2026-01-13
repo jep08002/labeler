@@ -1,0 +1,16 @@
+name: spacy_eval
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - jupyterlab
+  - pip:
+      - spacy==3.8.11
+      - nltk==3.9.2
+      - numpy==2.4.0
+      - pandas
+      - tqdm==4.67.1
+      - joblib==1.5.3
+      - smart_open==7.5.0
+      - regex==2025.11.3
