@@ -45,7 +45,7 @@ term_dict = {
     'device': ["pacer", "_line_", "lines", "picc", "ng tube", "og tube", "enteric tube", "valve", "catheter", "pacemaker", "hardware", "arthroplasty", "marker", "icd",
                "defib", "device", "drain", "plate", "screw", "cannula", "apparatus", "coil", "support", "equipment", "mediport", "port", "lead", "staple", "ekg", "telemetry",
                "enteral", "wire", "stent", "clip", "defibrillator", "nasogastric", "tubes", "drains", "devices"],
-    'intubation': ["endotracheal", "et tube", "from the carina", "above the carina", "above carina", "et"],
+    'intubation': ["endotracheal", "et tube", "from the carina", "above the carina", "above carina", "et", "intubated", "intubation", "endotracheal tube"],
     'heart_failure': ["chf", "heart failure", "volume overload", "cardiogenic", "vascular congestion", "congestion"],
     'fracture': ["fracture", "fx", "disruption", "nondisplaced", "fractures", "fractured"]
 }
