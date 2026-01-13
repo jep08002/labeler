@@ -417,3 +417,49 @@ def process_text(text):
     per_lbls = detect_labels_for_sentences(sentences)
     agg_lbls = aggregate_labels(per_lbls)
     return sentences, per_lbls, agg_lbls
+
+def init(model_name: str = "en_core_web_sm"):
+    """Initialize spaCy + PhraseMatcher. Must be called before process_text()."""
+    model = spacy.load(model_name)
+    set_nlp(model)
+    return model
+
+
+def main():
+    import argparse
+    import json
+    from pathlib import Path
+
+    parser = argparse.ArgumentParser(description="Run CXR labeler on a text string or .txt file.")
+    parser.add_argument("--model", default="en_core_web_sm", help="spaCy model name to load")
+    parser.add_argument("--text", help="Text to label")
+    parser.add_argument("--infile", help="Path to input .txt file")
+    parser.add_argument("--outfile", help="Path to output JSON file (optional)")
+    args, _ = parser.parse_known_args()
+
+    if not args.text and not args.infile:
+        parser.error("Provide either --text or --infile")
+
+    if args.infile:
+        text = Path(args.infile).read_text(encoding="utf-8")
+    else:
+        text = args.text
+
+    init(args.model)  # <-- THIS is the missing "entry/init" step
+
+    sentences, per_sentence_labels, aggregate = process_text(text)
+
+    out = {
+        "sentences": sentences,
+        "per_sentence_labels": per_sentence_labels,
+        "aggregate_labels": aggregate,
+    }
+
+    if args.outfile:
+        Path(args.outfile).write_text(json.dumps(out, indent=2), encoding="utf-8")
+    else:
+        print(json.dumps(out, indent=2))
+
+
+if __name__ == "__main__":
+    main()
