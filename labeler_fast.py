@@ -9,7 +9,7 @@ from spacy.matcher import PhraseMatcher
 nlp = None
 phrase_matcher = None
 TERM_LEMMAS = None
-RESOLUTION_LEMMAS = None
+RESOLUTION_LEMMAS = None 
 
 # Define term lists
 term_dict = {
