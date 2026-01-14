@@ -506,16 +506,22 @@ def side_mentions_consolidation(clause, side):
                 return True
     return False
 
-def detect_labels_for_sentences(sentences):
+def detect_labels_for_doc(doc):
     all_sentence_labels = []
-    for sent in sentences:
+
+    for sent_span in doc.sents:
+        sent_text = sent_span.text.strip()
+        if not sent_text:
+            continue
+
+        clauses = [c.strip() for c in split_into_clauses_doc(sent_span.as_doc()) if c.strip()]
+        if not clauses:
+            continue
+
         clause_labels = []
 
-        sent_doc = nlp(sent)                       # parse sentence once
-        clauses = split_into_clauses_doc(sent_doc) # no nlp() inside
-
-        for clause_text in clauses:
-            clause_doc = nlp(clause_text)          # parse each clause once
+        # Batch parse all clauses for this sentence
+        for clause_text, clause_doc in zip(clauses, nlp.pipe(clauses, batch_size=64)):
             label = detect_bilateral_consolidation_doc(clause_doc)
 
             if side_mentions_consolidation(clause_text, "left"):
@@ -535,6 +541,8 @@ def detect_labels_for_sentences(sentences):
         all_sentence_labels.append(aggregate_labels(clause_labels))
 
     return all_sentence_labels
+
+
 
     
 def aggregate_labels(labels_list):
@@ -569,13 +577,14 @@ def lemmatize_sentences(sentences):
 
 def process_text(text):
     doc = nlp(text)
-    sentences = [sent.text.strip() for sent in doc.sents if sent.text.strip()]
-    per_lbls = detect_labels_for_sentences(sentences)
+    sentences = [s.text.strip() for s in doc.sents if s.text.strip()]
+    per_lbls = detect_labels_for_doc(doc) 
     agg_lbls = aggregate_labels(per_lbls)
     return sentences, per_lbls, agg_lbls
 
+
 def init(model_name: str = "en_core_web_sm"):
-    model = spacy.load(model_name)
+    model = spacy.load(model_name, disable=["ner"])
 
     # HARD FAIL if POS pipeline is missing
     required = {"tagger", "morphologizer"}
@@ -609,12 +618,7 @@ def main():
         text = args.text
 
     init(args.model)  # <-- THIS is the missing "entry/init" step
-    
-    #Debug Text
-    print("PIPE:", nlp.pipe_names)
-    d1 = nlp("endotracheal tube unchanged")
-    print("POS_OK:", all(t.pos_ != "" for t in d1), "LEMMA:", [t.lemma_ for t in d1])
-    
+
     sentences, per_sentence_labels, aggregate = process_text(text)
 
     out = {
