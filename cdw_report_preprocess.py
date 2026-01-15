@@ -8,12 +8,16 @@ from typing import Optional, Tuple, List
 SEP_RE = re.compile(r"(?m)^\s*#{3,}\s*$")  # lines like ##### (or ###)
 
 # ---------- section headers ----------
-FINDINGS_HDR_RE = re.compile(r"(?im)^\s*findi\w*\s*:?\s*$")
-IMPRESSION_HDR_RE = re.compile(r"(?im)^\s*impressi\w*\s*:?\s*$")
+FINDINGS_HDR_RE = re.compile(r"(?im)^\s*findi\w*\s*[:/]\s*$")
+IMPRESSION_HDR_RE = re.compile(r"(?im)^\s*impressi\w*\s*[:/]\s*$")
 
 # Inline headers (when Findings: is on same line as content)
 FINDINGS_INLINE_RE = re.compile(r"(?i)findi\w*\s*:\s*")
 IMPRESSION_INLINE_RE = re.compile(r"(?i)impressi\w*\s*:\s*")
+
+# Delete any line containing "history:" (case-insensitive), even if it's the last line (no trailing newline)
+HISTORY_LINE_RE = re.compile(r"(?im)^.*\bhistory\s*:.*(?:\r?\n|$)")
+
 
 # ---------- ID + datetime patterns ----------
 ICN_RE = re.compile(r"\b(\d{9,12})\b")
@@ -93,6 +97,9 @@ def extract_findings_impression(report_body: str) -> str:
     """
     t = report_body.replace("\r\n", "\n").replace("\r", "\n")
     t = squash_commas_and_quotes(t)
+    
+    # Remove any line containing "history:" (case-insensitive), up to newline
+    t = HISTORY_LINE_RE.sub("", t)
 
     # Try clean line-based headers first
     f_match = next(FINDINGS_HDR_RE.finditer(t), None)
