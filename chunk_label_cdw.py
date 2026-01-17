@@ -3,7 +3,7 @@ python chunk_label_cdw.py \
   --infile cleaned_reports.csv \
   --outfile-base cxr_labeled_chunk0001 \
   --save-every 1500
-  ""
+  """
 
 #!C:\Users\VHACONPeterJ\labeler\.labeler\Scripts\python.exe
 import argparse
