@@ -5,7 +5,7 @@ python chunk_label_cdw.py \
   --save-every 1500
   ""
 
-#!/usr/bin/env python3
+#!C:\Users\VHACONPeterJ\labeler\.labeler\Scripts\python.exe
 import argparse
 import time
 from pathlib import Path
